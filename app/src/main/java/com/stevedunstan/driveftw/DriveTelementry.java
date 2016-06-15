@@ -11,7 +11,7 @@ public class DriveTelementry {
 
 
 
-
+    private float revPerMinute;
     private float throttle_position;
     private float speed;
     private float engineLoad;
@@ -58,5 +58,11 @@ public class DriveTelementry {
         this.fuelLevel = fuelLevel;
     }
 
+    public float getRevPerMinute() {
+        return revPerMinute;
+    }
 
+    public void setRevPerMinute(float revPerMinute) {
+        this.revPerMinute = revPerMinute;
+    }
 }
