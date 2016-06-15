@@ -5,6 +5,9 @@ import android.content.SharedPreferences;
 
 import com.stevedunstan.driveftw.bluetooth.DeviceManager;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by computer on 6/15/2016.
  */
@@ -19,6 +22,8 @@ public class EconomicData {
     public float costOfVehicle;
     public String userName;
 
+    private Context context;
+
     private static String EST_MAINT_COST_PER_YEAR = "estMaintCostsPerYear";
     private static String INSURANCE_COST_PER_YEAR = "insuranceCostsPerYear";
     private static String EST_MILES_PER_YEAR = "estMilesPerYear";
@@ -26,6 +31,9 @@ public class EconomicData {
     private static String EST_YEARS_KEEP = "estYearsKeep";
     private static String COST_OF_VEHICLE = "costOfVehicle";
     private static String USER_NAME = "userName";
+
+    public EconomicData(){}
+    public EconomicData(Context ctx){this.context = ctx;}
 
     public void saveEconData(Context ctx) {
         SharedPreferences sharedPreferences = ctx.getSharedPreferences(DeviceManager.DRIVE_FTW_SHARED_PREFERENCES, 0);
@@ -44,6 +52,26 @@ public class EconomicData {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(USER_NAME, userName);
         editor.commit();
+    }
+
+    public Map<String, Float> retrieveSharedPrefValues(){
+        Map<String, Float> result = new HashMap<String, Float>();
+        SharedPreferences sharedPreferences = this.context.getSharedPreferences(DeviceManager.DRIVE_FTW_SHARED_PREFERENCES, 0);
+        result.put(EST_MAINT_COST_PER_YEAR, sharedPreferences.getFloat(EST_MAINT_COST_PER_YEAR, 0));
+        result.put(INSURANCE_COST_PER_YEAR, sharedPreferences.getFloat(INSURANCE_COST_PER_YEAR, 0));
+        result.put(TOTAL_OPERATING_COST_PER_YEAR, sharedPreferences.getFloat(TOTAL_OPERATING_COST_PER_YEAR, 0));
+        result.put(COST_OF_VEHICLE, sharedPreferences.getFloat(COST_OF_VEHICLE, 0));
+
+        result.put(EST_MILES_PER_YEAR, sharedPreferences.getFloat(EST_MILES_PER_YEAR, 0));
+        result.put(EST_YEARS_KEEP, sharedPreferences.getFloat(EST_YEARS_KEEP, 0));
+        return result;
+    }
+    public float getTotalCostForOwnership(){
+        Map<String, Float> storedPrefVals = retrieveSharedPrefValues();
+        float yearlies = storedPrefVals.get(EST_MAINT_COST_PER_YEAR) +
+                storedPrefVals.get(INSURANCE_COST_PER_YEAR) +
+                storedPrefVals.get(TOTAL_OPERATING_COST_PER_YEAR);
+        return (yearlies * storedPrefVals.get(EST_YEARS_KEEP)) + storedPrefVals.get(COST_OF_VEHICLE);
     }
 
     public float getEstMaintCostsPerYear() {
