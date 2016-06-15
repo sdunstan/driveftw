@@ -73,10 +73,12 @@ public class DriveService extends IntentService {
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             Log.d(TAG, "Getting BT device at address " + bluetoothAddress);
             BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(bluetoothAddress);
+
             // well known bluetooth UUID
             UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
             Log.d(TAG, "creating socket at well known UUID");
             socket = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(uuid);
+
             Log.d(TAG, "connecting to BT socket");
             socket.connect();
             initializeODB2(socket);
@@ -130,17 +132,18 @@ public class DriveService extends IntentService {
 
 
     private void collectTelemetry(BluetoothSocket socket) throws InterruptedException, IOException {
-        RPMCommand rpm = new RPMCommand();
-        ConsumptionRateCommand consumptionRateCommand = new ConsumptionRateCommand();
-        Map<String, String> telemetry = new HashMap<>();
-        RuntimeCommand engineRuntime = new RuntimeCommand();
-        SpeedCommand speedCommand = new SpeedCommand();
-        ThrottlePositionCommand throttlePositionCommand = new ThrottlePositionCommand();
-        LoadCommand engineLoadCommand = new LoadCommand();
-        FuelLevelCommand fuelLevelCommand = new FuelLevelCommand();
-
         while(socket.isConnected()) {
             Thread.sleep(5000);
+
+            Map<String, String> telemetry = new HashMap<>();
+            RPMCommand rpm = new RPMCommand();
+            ConsumptionRateCommand consumptionRateCommand = new ConsumptionRateCommand();
+            RuntimeCommand engineRuntime = new RuntimeCommand();
+            SpeedCommand speedCommand = new SpeedCommand();
+            ThrottlePositionCommand throttlePositionCommand = new ThrottlePositionCommand();
+            LoadCommand engineLoadCommand = new LoadCommand();
+            FuelLevelCommand fuelLevelCommand = new FuelLevelCommand();
+
             Log.d(TAG, "Running RPM command");
             sendCommand(rpm, socket, telemetry, RPM);
 
@@ -164,8 +167,14 @@ public class DriveService extends IntentService {
             Log.d(TAG, "Running fuel consumption");
             sendCommand(consumptionRateCommand, socket, telemetry, FUEL_CONSUMPTION);
 
-            reportTelemetry(telemetry);
+            addTelemetryToList(telemetry);
         }
+
+        // TODO: create DriveTelemetry object and broadcast it
+        // TODO: create notification
+    }
+
+    private void addTelemetryToList(Map<String, String> telemetry) {
 
     }
 

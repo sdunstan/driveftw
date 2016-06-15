@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.stevedunstan.driveftw.bluetooth.DeviceException;
 import com.stevedunstan.driveftw.bluetooth.DeviceManager;
 
@@ -134,10 +136,13 @@ public class MainActivity extends AppCompatActivity {
                 new IntentFilter(DRIVE_TELEMETRY_EVENT));
     }
 
-    private void report(String msg) {
+    private synchronized void report(String msg) {
         Log.i(TAG, "Message from ODB: " + msg);
         if (mTelemetry != null && msg != null) {
             mTelemetry.append("\n" + msg);
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference log = database.getReference().child();
+//            log.
         }
     }
 
