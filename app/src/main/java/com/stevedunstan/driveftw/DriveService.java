@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -24,7 +25,9 @@ import com.github.pires.obd.commands.protocol.TimeoutCommand;
 import com.github.pires.obd.enums.ObdProtocols;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -43,6 +46,9 @@ public class DriveService extends IntentService {
     public static final String ENGINE_LOAD = "ENGINE_LOAD";
     public static final String FUEL_LEVEL="FUEL_LEVEL";
     public static final String FUEL_CONSUMPTION = "FUEL_CONSUMPTION";
+
+
+    public List<DriveTelementry> driveTelementryList = new ArrayList<>();
 
     public DriveService() {
         super("DriveService");
@@ -109,11 +115,11 @@ public class DriveService extends IntentService {
         Log.d(TAG, "Sensor configured");
     }
 
-    private void sendCommand(ObdCommand command, BluetoothSocket socket, Map<String, String> telemetry, String commandName) throws IOException, InterruptedException {
+    private void sendCommand(ObdCommand command, BluetoothSocket socket, Map<String, ObdCommand> telemetry, String commandName) throws IOException, InterruptedException {
         try {
             command.run(socket.getInputStream(), socket.getOutputStream());
             if (telemetry != null && commandName != null) {
-                telemetry.put(commandName, command.getFormattedResult());
+                telemetry.put(commandName, command);
             }
         }
         catch(RuntimeException exc) {
@@ -121,7 +127,7 @@ public class DriveService extends IntentService {
             try {
                 command.run(socket.getInputStream(), socket.getOutputStream());
                 if (telemetry != null && commandName != null) {
-                    telemetry.put(commandName, command.getFormattedResult());
+                    telemetry.put(commandName, command);
                 }
             }
             catch (RuntimeException exc2) {
@@ -135,7 +141,8 @@ public class DriveService extends IntentService {
         while(socket.isConnected()) {
             Thread.sleep(5000);
 
-            Map<String, String> telemetry = new HashMap<>();
+            Map<String, ObdCommand >  telemetry = new HashMap<>();
+
             RPMCommand rpm = new RPMCommand();
             ConsumptionRateCommand consumptionRateCommand = new ConsumptionRateCommand();
             RuntimeCommand engineRuntime = new RuntimeCommand();
@@ -167,15 +174,54 @@ public class DriveService extends IntentService {
             Log.d(TAG, "Running fuel consumption");
             sendCommand(consumptionRateCommand, socket, telemetry, FUEL_CONSUMPTION);
 
-            addTelemetryToList(telemetry);
+            driveTelementryList.add(addTelemetryToList(telemetry));
         }
 
         // TODO: create DriveTelemetry object and broadcast it
         // TODO: create notification
     }
 
-    private void addTelemetryToList(Map<String, String> telemetry) {
+    private DriveTelementry addTelemetryToList(Map<String, ObdCommand> telemetry) {
 
+        DriveTelementry driveTelementry = new DriveTelementry();
+
+        float speed,engineLoad,throttle_position,fuelLevel;
+
+
+              Float speedy = Float.parseFloat(telemetry.get(SPEED).getCalculatedResult());
+              Float engineLoady = Float.parseFloat(telemetry.get(ENGINE_LOAD).getCalculatedResult());
+              Float fuelLevely = Float.parseFloat(telemetry.get(FUEL_LEVEL).getCalculatedResult());
+              Float throttle_positiony = Float.parseFloat(telemetry.get(THROTTLE_POSITION).getCalculatedResult());
+
+        if(speedy != null){
+            speed = speedy.floatValue();
+        }else {
+            speed = 0;
+        }
+        if(engineLoady != null){
+            engineLoad = engineLoady.floatValue();
+        }else{
+            engineLoad =0;
+        }
+        if(fuelLevely != null) {
+            fuelLevel = fuelLevely.floatValue();
+        }else{
+            fuelLevel=0;
+        }
+        if(throttle_positiony != null) {
+            throttle_position = throttle_positiony.floatValue();
+        }else {
+            throttle_position=0;
+        }
+
+
+        driveTelementry.setEngineRunTime(telemetry.get(ENGINE_RUNTIME).getFormattedResult());
+        driveTelementry.setSpeed(speed);
+        driveTelementry.setEngineLoad(engineLoad);
+        driveTelementry.setFuelLevel(fuelLevel);
+        driveTelementry.setThrottle_position(throttle_position);
+
+        return  driveTelementry;
     }
 
     private void reportTelemetry(Map<String, String> telemetry) {

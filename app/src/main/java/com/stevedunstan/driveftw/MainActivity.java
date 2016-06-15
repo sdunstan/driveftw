@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.stevedunstan.driveftw.bluetooth.DeviceException;
 import com.stevedunstan.driveftw.bluetooth.DeviceManager;
+import com.stevedunstan.driveftw.calculation.TripScoreCalculator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,10 +39,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        EconomicData ed = new EconomicData(this);
+        TripScoreCalculator tsc = new TripScoreCalculator();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mTelemetry = (TextView) findViewById(R.id.telemetry);
         Button scoreButton = (Button) findViewById(R.id.scoreButton);
+
+        scoreButton.setText(Integer.toString(tsc.getTripScore(ed)));
+
         scoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
