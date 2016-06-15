@@ -8,6 +8,7 @@ import com.stevedunstan.driveftw.bluetooth.DeviceManager;
 /**
  * Created by computer on 6/15/2016.
  */
+
 public class EconomicData {
     //cost estimates
     public float estMaintCostsPerYear;
@@ -44,7 +45,7 @@ public class EconomicData {
         editor.putString(USER_NAME, userName);
         editor.commit();
     }
-    
+
     public float getEstMaintCostsPerYear() {
         return estMaintCostsPerYear;
     }
@@ -91,5 +92,13 @@ public class EconomicData {
 
     public void setCostOfVehicle(float costOfVehicle) {
         this.costOfVehicle = costOfVehicle;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }
