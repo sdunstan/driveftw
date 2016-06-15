@@ -22,13 +22,11 @@ import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
 import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
 import com.github.pires.obd.commands.protocol.TimeoutCommand;
 import com.github.pires.obd.enums.ObdProtocols;
-import com.github.pires.obd.exceptions.ResponseException;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ThreadFactory;
 
 public class DriveService extends IntentService {
     public static final String DRIVE_TELEMETRY_EVENT = "com.stevedunstan.driveftw.action.DRIVE_TELEMETRY";
@@ -38,13 +36,14 @@ public class DriveService extends IntentService {
     private static final String ACTION_START_DRIVE = "com.stevedunstan.driveftw.action.START_DRIVE";
     private static final String EXTRA_ODB2_ADDRESS = "com.stevedunstan.driveftw.extra.ADDRESS";
     private static final String TAG = DriveService.class.getName();
-    private static final String RPM = "RPM";
-    private static final String ENGINE_RUNTIME= "ENGINE_RUNTIME";
-    private static final String SPEED = "SPEED";
-    private static final String THROTTLE_POSITION = "THROTTLE_POSITION";
-    private static final String ENGINE_LOAD = "ENGINE_LOAD";
-    private static final String FUEL_LEVEL="FUEL_LEVEL";
-    private static final String FUEL_CONSUMPTION = "FUEL_CONSUMPTION";
+    public static final String RPM = "RPM";
+    public static final String ENGINE_RUNTIME= "ENGINE_RUNTIME";
+    public static final String SPEED = "SPEED";
+    public static final String THROTTLE_POSITION = "THROTTLE_POSITION";
+    public static final String ENGINE_LOAD = "ENGINE_LOAD";
+    public static final String FUEL_LEVEL="FUEL_LEVEL";
+    public static final String FUEL_CONSUMPTION = "FUEL_CONSUMPTION";
+
     public DriveService() {
         super("DriveService");
     }
@@ -98,7 +97,7 @@ public class DriveService extends IntentService {
 
     private void initializeODB2(BluetoothSocket socket) throws IOException, InterruptedException {
         Log.d(TAG, "Setting echo off");
-        sendCommand(new EchoOffCommand(), socket);
+        sendCommand(new EchoOffCommand(), socket, null, null);
         Log.d(TAG, "Setting line feed off");
         new LineFeedOffCommand().run(socket.getInputStream(), socket.getOutputStream());
         Log.d(TAG, "Setting timeout");
@@ -108,52 +107,66 @@ public class DriveService extends IntentService {
         Log.d(TAG, "Sensor configured");
     }
 
-    private void sendCommand(ObdCommand command, BluetoothSocket socket) throws IOException, InterruptedException {
+    private void sendCommand(ObdCommand command, BluetoothSocket socket, Map<String, String> telemetry, String commandName) throws IOException, InterruptedException {
         try {
             command.run(socket.getInputStream(), socket.getOutputStream());
+            if (telemetry != null && commandName != null) {
+                telemetry.put(commandName, command.getFormattedResult());
+            }
         }
-        catch(ResponseException exc) {
+        catch(RuntimeException exc) {
             Log.e(TAG, "Retrying, command failed result was " + command.getResult());
-            command.run(socket.getInputStream(), socket.getOutputStream());
+            try {
+                command.run(socket.getInputStream(), socket.getOutputStream());
+                if (telemetry != null && commandName != null) {
+                    telemetry.put(commandName, command.getFormattedResult());
+                }
+            }
+            catch (RuntimeException exc2) {
+                Log.e(TAG, "Retry failed. Giving up. Command failed result was " + command.getResult());
+            }
         }
     }
 
 
     private void collectTelemetry(BluetoothSocket socket) throws InterruptedException, IOException {
         RPMCommand rpm = new RPMCommand();
+        ConsumptionRateCommand consumptionRateCommand = new ConsumptionRateCommand();
         Map<String, String> telemetry = new HashMap<>();
         RuntimeCommand engineRuntime = new RuntimeCommand();
         SpeedCommand speedCommand = new SpeedCommand();
         ThrottlePositionCommand throttlePositionCommand = new ThrottlePositionCommand();
         LoadCommand engineLoadCommand = new LoadCommand();
         FuelLevelCommand fuelLevelCommand = new FuelLevelCommand();
-        ConsumptionRateCommand consumptionRateCommand = new ConsumptionRateCommand();
 
         while(socket.isConnected()) {
             Thread.sleep(5000);
             Log.d(TAG, "Running RPM command");
-            rpm.run(socket.getInputStream(), socket.getOutputStream());
-            telemetry.put(RPM, rpm.getFormattedResult());
+            sendCommand(rpm, socket, telemetry, RPM);
+
             Log.d(TAG, "Running Engine Runtime");
-            engineRuntime.run(socket.getInputStream(), socket.getOutputStream());
-            telemetry.put(ENGINE_RUNTIME, engineRuntime.getFormattedResult());
+            sendCommand(engineRuntime, socket, telemetry, ENGINE_RUNTIME);
+
             Log.d(TAG, "Running Speed command");
-            speedCommand.run(socket.getInputStream(), socket.getOutputStream());
-            telemetry.put(SPEED, speedCommand.getFormattedResult());
-            throttlePositionCommand.run(socket.getInputStream(), socket.getOutputStream());
+            sendCommand(speedCommand, socket, telemetry, SPEED);
+
             Log.d(TAG, "Running Throttle position");
-            telemetry.put(THROTTLE_POSITION, throttlePositionCommand.getFormattedResult());
+            sendCommand(throttlePositionCommand, socket, telemetry, THROTTLE_POSITION);
+
+
             Log.d(TAG, "Running Engined Load command");
-            engineLoadCommand.run(socket.getInputStream(), socket.getOutputStream());
-            telemetry.put(ENGINE_LOAD, engineLoadCommand.getFormattedResult());
+            sendCommand(engineLoadCommand, socket, telemetry, ENGINE_LOAD);
+
             Log.d(TAG, "Running Fuel Level command");
-            fuelLevelCommand.run(socket.getInputStream(), socket.getOutputStream());
-            telemetry.put(FUEL_LEVEL, fuelLevelCommand.getFormattedResult());
+            sendCommand(fuelLevelCommand, socket, telemetry, FUEL_LEVEL);
+
+
             Log.d(TAG, "Running fuel consumption");
-            consumptionRateCommand.run(socket.getInputStream(),socket.getOutputStream());
-            telemetry.put(FUEL_CONSUMPTION, consumptionRateCommand.getFormattedResult());
+            sendCommand(consumptionRateCommand, socket, telemetry, FUEL_CONSUMPTION);
+
             reportTelemetry(telemetry);
         }
+
     }
 
     private void reportTelemetry(Map<String, String> telemetry) {

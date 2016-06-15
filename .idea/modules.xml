@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/DriveFTW.iml" filepath="$PROJECT_DIR$/DriveFTW.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/driveftw.iml" filepath="$PROJECT_DIR$/driveftw.iml" />
     </modules>
   </component>
 </project>

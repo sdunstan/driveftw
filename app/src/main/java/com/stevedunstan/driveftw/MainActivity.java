@@ -63,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
         mTelemetryReciever = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                report(intent.getStringExtra("RPM"));
+                report(intent.getStringExtra(DriveService.RPM));
+                report(intent.getStringExtra(DriveService.FUEL_CONSUMPTION));
             }
         };
 
@@ -102,6 +103,9 @@ public class MainActivity extends AppCompatActivity {
                 Intent carInfoIntent = new Intent(this, CarInfoActivity.class);
                 startActivity(carInfoIntent);
                 break;
+            case R.id.action_reconnect:
+                onReconnect(null);
+                break;
             default:
                 break;
         }
@@ -132,8 +136,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void report(String msg) {
         Log.i(TAG, "Message from ODB: " + msg);
-        if (mTelemetry != null) {
-            mTelemetry.setText(msg != null ? msg : "");
+        if (mTelemetry != null && msg != null) {
+            mTelemetry.append("\n" + msg);
         }
     }
 

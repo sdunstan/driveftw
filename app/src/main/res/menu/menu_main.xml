@@ -19,4 +19,10 @@
         app:showAsAction="ifRoom"
         ></item>
 
+    <item
+        android:id="@+id/action_reconnect"
+        android:orderInCategory="200"
+        android:title="Reconnect"
+        app:showAsAction="never"
+        ></item>
 </menu>
