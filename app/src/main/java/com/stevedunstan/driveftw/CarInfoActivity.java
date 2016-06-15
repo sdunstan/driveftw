@@ -5,16 +5,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.EditText;
 
 public class CarInfoActivity extends AppCompatActivity {
 
-    private TextView mGamerTag;
-    private TextView mYears;
-    private TextView mMiles;
-    private TextView mInsurance;
-    private TextView mMaintenance;
-    private TextView mPrice;
+    private EditText mGamerTag;
+    private EditText mYears;
+    private EditText mMiles;
+    private EditText mInsurance;
+    private EditText mMaintenance;
+    private EditText mPrice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,12 +23,12 @@ public class CarInfoActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mGamerTag = (TextView) findViewById(R.id.gamerTag);
-        mYears = (TextView) findViewById(R.id.yearsOwnership);
-        mMiles = (TextView) findViewById(R.id.milesPerYear);
-        mInsurance = (TextView) findViewById(R.id.insurance);
-        mMaintenance = (TextView) findViewById(R.id.mainenance);
-        mPrice = (TextView) findViewById(R.id.purchasePrice);
+        mGamerTag = (EditText) findViewById(R.id.gamerTag);
+        mYears = (EditText) findViewById(R.id.yearsOwnership);
+        mMiles = (EditText) findViewById(R.id.milesPerYear);
+        mInsurance = (EditText) findViewById(R.id.insurance);
+        mMaintenance = (EditText) findViewById(R.id.mainenance);
+        mPrice = (EditText) findViewById(R.id.purchasePrice);
 
         Button saveButton = (Button) findViewById(R.id.saveButton);
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -36,6 +36,9 @@ public class CarInfoActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // TODO: grab values from TextView instance variables,
                 // instantiate an EconomicData object, save to shared preferences.
+//                EconomicData data = new EconomicData();
+//                data.setCostOfVehicle(mPrice.getText());
+                // data.save();
             }
         });
 
