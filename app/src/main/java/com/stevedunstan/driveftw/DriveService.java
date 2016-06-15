@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
+import com.github.pires.obd.commands.engine.LoadCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.engine.RuntimeCommand;
 import com.github.pires.obd.commands.engine.ThrottlePositionCommand;
@@ -38,6 +39,7 @@ public class DriveService extends IntentService {
     private static final String ENGINE_RUNTIME= "ENGINE_RUNTIME";
     private static final String SPEED = "SPEED";
     private static final String THROTTLE_POSITION = "THROTTLE_POSITION";
+    private static final String ENGINE_LOAD = "ENGINE_LOAD";
     public DriveService() {
         super("DriveService");
     }
@@ -118,6 +120,7 @@ public class DriveService extends IntentService {
         RuntimeCommand engineRuntime = new RuntimeCommand();
         SpeedCommand speedCommand = new SpeedCommand();
         ThrottlePositionCommand throttlePositionCommand = new ThrottlePositionCommand();
+        LoadCommand engineLoadCommand = new LoadCommand();
 
             Log.d(TAG, "Running RPM command");
             rpm.run(socket.getInputStream(), socket.getOutputStream());
@@ -131,8 +134,10 @@ public class DriveService extends IntentService {
             throttlePositionCommand.run(socket.getInputStream(),socket.getOutputStream());
             Log.d(TAG,"Running Throttle position");
             telemetry.put(THROTTLE_POSITION, throttlePositionCommand.getFormattedResult());
+            Log.d(TAG, "Running Engined Load command");
+            engineLoadCommand.run(socket.getInputStream(),socket.getOutputStream());
+            telemetry.put(ENGINE_LOAD,engineLoadCommand.getFormattedResult());
         
-
             reportTelemetry(telemetry);
         }
     }
