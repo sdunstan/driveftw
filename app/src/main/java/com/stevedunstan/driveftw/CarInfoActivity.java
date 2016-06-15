@@ -36,9 +36,15 @@ public class CarInfoActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // TODO: grab values from TextView instance variables,
                 // instantiate an EconomicData object, save to shared preferences.
-//                EconomicData data = new EconomicData();
-//                data.setCostOfVehicle(mPrice.getText());
-                // data.save();
+                EconomicData data = new EconomicData();
+                data.setEstYearsKeep(Float.valueOf(mYears.getText().toString()));
+                data.setCostOfVehicle(Float.valueOf(mPrice.getText().toString()));
+                data.setEstMaintCostsPerYear(Float.valueOf(mMaintenance.getText().toString()));
+                data.setEstMilesPerYear(Float.valueOf(mMiles.getText().toString()));
+                data.setInsuranceCostsPerYear(Float.valueOf(mInsurance.getText().toString()));
+                data.setUserName(mGamerTag.getText().toString());
+                data.saveEconData(CarInfoActivity.this);
+                data.saveUserName(CarInfoActivity.this);
             }
         });
 
