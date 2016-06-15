@@ -20,6 +20,7 @@ public class DeviceManager {
 
 
     public synchronized static void showListOfDevices(final Context context) throws DeviceException {
+        Log.d(TAG,"Going into show list of devices");
         Map<String,Device> deviceMap = getDeviceAddresses(context);
         if (!deviceMap.isEmpty()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -53,12 +54,17 @@ public class DeviceManager {
     private static Map<String,Device> getDeviceAddresses(Context context) {
         Map<String, Device> addresses = new java.util.HashMap<>();
 
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
 
-        for(BluetoothDevice device : pairedDevices) {
-            Log.d(TAG, "Found device " + device.getName());
-            addresses.put(device.getAddress(), new Device(device.getAddress(), device.getName()));
+
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if(bluetoothAdapter != null) {
+            Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+
+            for (BluetoothDevice device : pairedDevices) {
+                Log.d(TAG, "Found device " + device.getName());
+                addresses.put(device.getAddress(), new Device(device.getAddress(), device.getName()));
+            }
         }
         return addresses;
     }
