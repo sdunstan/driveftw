@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class DeviceManager {
-    private static final String DRIVE_FTW_SHARED_PREFERENCES = "com.stevedunstan.drivefwt.DRIVE_FTW_SP";
+    public static final String DRIVE_FTW_SHARED_PREFERENCES = "com.stevedunstan.drivefwt.DRIVE_FTW_SP";
     private static final String DRIVE_FTW_BLUETOOTH_DEVICE_NAME = "BLUETOOTH_DEVICE_NAME";
     private static final String DRIVE_FTW_BLUETOOTH_DEVICE = "BLUETOOTH_DEVICE";
     private static final String TAG = DeviceManager.class.getName();
