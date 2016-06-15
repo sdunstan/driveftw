@@ -15,6 +15,7 @@ import com.github.pires.obd.commands.engine.LoadCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.engine.RuntimeCommand;
 import com.github.pires.obd.commands.engine.ThrottlePositionCommand;
+import com.github.pires.obd.commands.fuel.ConsumptionRateCommand;
 import com.github.pires.obd.commands.fuel.FuelLevelCommand;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
@@ -43,6 +44,7 @@ public class DriveService extends IntentService {
     private static final String THROTTLE_POSITION = "THROTTLE_POSITION";
     private static final String ENGINE_LOAD = "ENGINE_LOAD";
     private static final String FUEL_LEVEL="FUEL_LEVEL";
+    private static final String FUEL_CONSUMPTION = "FUEL_CONSUMPTION";
     public DriveService() {
         super("DriveService");
     }
@@ -125,6 +127,8 @@ public class DriveService extends IntentService {
         ThrottlePositionCommand throttlePositionCommand = new ThrottlePositionCommand();
         LoadCommand engineLoadCommand = new LoadCommand();
         FuelLevelCommand fuelLevelCommand = new FuelLevelCommand();
+        ConsumptionRateCommand consumptionRateCommand = new ConsumptionRateCommand();
+
         while(socket.isConnected()) {
             Thread.sleep(5000);
             Log.d(TAG, "Running RPM command");
@@ -145,6 +149,9 @@ public class DriveService extends IntentService {
             Log.d(TAG, "Running Fuel Level command");
             fuelLevelCommand.run(socket.getInputStream(), socket.getOutputStream());
             telemetry.put(FUEL_LEVEL, fuelLevelCommand.getFormattedResult());
+            Log.d(TAG, "Running fuel consumption");
+            consumptionRateCommand.run(socket.getInputStream(),socket.getOutputStream());
+            telemetry.put(FUEL_CONSUMPTION, consumptionRateCommand.getFormattedResult());
             reportTelemetry(telemetry);
         }
     }
