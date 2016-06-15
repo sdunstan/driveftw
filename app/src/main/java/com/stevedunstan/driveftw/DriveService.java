@@ -15,6 +15,7 @@ import com.github.pires.obd.commands.engine.LoadCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.engine.RuntimeCommand;
 import com.github.pires.obd.commands.engine.ThrottlePositionCommand;
+import com.github.pires.obd.commands.fuel.FuelLevelCommand;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
 import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ThreadFactory;
 
 public class DriveService extends IntentService {
     public static final String DRIVE_TELEMETRY_EVENT = "com.stevedunstan.driveftw.action.DRIVE_TELEMETRY";
@@ -40,6 +42,7 @@ public class DriveService extends IntentService {
     private static final String SPEED = "SPEED";
     private static final String THROTTLE_POSITION = "THROTTLE_POSITION";
     private static final String ENGINE_LOAD = "ENGINE_LOAD";
+    private static final String FUEL_LEVEL="FUEL_LEVEL";
     public DriveService() {
         super("DriveService");
     }
@@ -121,7 +124,9 @@ public class DriveService extends IntentService {
         SpeedCommand speedCommand = new SpeedCommand();
         ThrottlePositionCommand throttlePositionCommand = new ThrottlePositionCommand();
         LoadCommand engineLoadCommand = new LoadCommand();
-
+        FuelLevelCommand fuelLevelCommand = new FuelLevelCommand();
+        while(socket.isConnected()) {
+            Thread.sleep(5000);
             Log.d(TAG, "Running RPM command");
             rpm.run(socket.getInputStream(), socket.getOutputStream());
             telemetry.put(RPM, rpm.getFormattedResult());
@@ -130,14 +135,16 @@ public class DriveService extends IntentService {
             telemetry.put(ENGINE_RUNTIME, engineRuntime.getFormattedResult());
             Log.d(TAG, "Running Speed command");
             speedCommand.run(socket.getInputStream(), socket.getOutputStream());
-            telemetry.put(SPEED,speedCommand.getFormattedResult());
-            throttlePositionCommand.run(socket.getInputStream(),socket.getOutputStream());
-            Log.d(TAG,"Running Throttle position");
+            telemetry.put(SPEED, speedCommand.getFormattedResult());
+            throttlePositionCommand.run(socket.getInputStream(), socket.getOutputStream());
+            Log.d(TAG, "Running Throttle position");
             telemetry.put(THROTTLE_POSITION, throttlePositionCommand.getFormattedResult());
             Log.d(TAG, "Running Engined Load command");
-            engineLoadCommand.run(socket.getInputStream(),socket.getOutputStream());
-            telemetry.put(ENGINE_LOAD,engineLoadCommand.getFormattedResult());
-        
+            engineLoadCommand.run(socket.getInputStream(), socket.getOutputStream());
+            telemetry.put(ENGINE_LOAD, engineLoadCommand.getFormattedResult());
+            Log.d(TAG, "Running Fuel Level command");
+            fuelLevelCommand.run(socket.getInputStream(), socket.getOutputStream());
+            telemetry.put(FUEL_LEVEL, fuelLevelCommand.getFormattedResult());
             reportTelemetry(telemetry);
         }
     }
