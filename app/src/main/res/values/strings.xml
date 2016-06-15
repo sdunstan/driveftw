@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">DriveFTW</string>
+    <string name="app_name">Drive FTW</string>
+    <string name="title_activity_drive_history">DriveHistoryActivity</string>
+    <string name="title_activity_leaderboard">LeaderboardActivity</string>
+    <string name="title_activity_achievements">AchievementsActivity</string>
+    <string name="title_activity_car_info">CarInfoActivity</string>
 </resources>

@@ -8,7 +8,10 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,8 +35,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         mTelemetry = (TextView) findViewById(R.id.telemetry);
+        Button scoreButton = (Button) findViewById(R.id.scoreButton);
+        scoreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, LeaderboardActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        Button acheivementsButton = (Button) findViewById(R.id.eraseMe);
+        acheivementsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, AchievementsActivity.class);
+                startActivity(intent);
+            }
+        });
 
         mExceptionReciever = new BroadcastReceiver() {
             @Override
@@ -62,6 +81,32 @@ public class MainActivity extends AppCompatActivity {
         else {
             DriveService.startActionDrive(this, mDeviceAddress);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.action_history:
+                Intent driveHistoryIntent = new Intent(this, DriveHistoryActivity.class);
+                startActivity(driveHistoryIntent);
+                break;
+            case R.id.action_car_info:
+                Intent carInfoIntent = new Intent(this, CarInfoActivity.class);
+                startActivity(carInfoIntent);
+                break;
+            default:
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
