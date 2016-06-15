@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
+import com.github.pires.obd.commands.engine.RuntimeCommand;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
 import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
@@ -32,6 +33,7 @@ public class DriveService extends IntentService {
     private static final String EXTRA_ODB2_ADDRESS = "com.stevedunstan.driveftw.extra.ADDRESS";
     private static final String TAG = DriveService.class.getName();
     private static final String RPM = "RPM";
+    private static final String ENGINE_RUNTIME= "ENGINE_RUNTIME";
 
     public DriveService() {
         super("DriveService");
@@ -110,11 +112,16 @@ public class DriveService extends IntentService {
     private void collectTelemetry(BluetoothSocket socket) throws InterruptedException, IOException {
         RPMCommand rpm = new RPMCommand();
         Map<String, String> telemetry = new HashMap<>();
+        RuntimeCommand engineRuntime = new RuntimeCommand();
         while(socket.isConnected()) {
             Thread.sleep(5000);
             Log.d(TAG, "Running RPM command");
             rpm.run(socket.getInputStream(), socket.getOutputStream());
             telemetry.put(RPM, rpm.getFormattedResult());
+            Log.d(TAG, "Running Engine Runtime");
+            engineRuntime.run(socket.getInputStream(), socket.getOutputStream());
+            telemetry.put(ENGINE_RUNTIME, engineRuntime.getFormattedResult());
+            
 
             reportTelemetry(telemetry);
         }
