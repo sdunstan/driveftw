@@ -20,6 +20,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.stevedunstan.driveftw.bluetooth.DeviceException;
 import com.stevedunstan.driveftw.bluetooth.DeviceManager;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.stevedunstan.driveftw.DriveService.DRIVE_TELEMETRY_EVENT;
 import static com.stevedunstan.driveftw.DriveService.DRIVE_TELEMETRY_STOPPED_EVENT;
 
@@ -140,9 +143,6 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "Message from ODB: " + msg);
         if (mTelemetry != null && msg != null) {
             mTelemetry.append("\n" + msg);
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference log = database.getReference().child();
-//            log.
         }
     }
 
