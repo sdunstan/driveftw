@@ -30,7 +30,7 @@ public class TripScoreCalculator {
     }
 
 
-    public int getTripScore(EconomicData ed, List<DriveTelementry> telemetries){
+    public int getTripScore(List<DriveTelementry> telemetries){
         return tabulateFromList(telemetries);
     }
 

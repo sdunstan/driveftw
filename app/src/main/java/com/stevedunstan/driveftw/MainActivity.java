@@ -34,8 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        EconomicData ed = new EconomicData(this);
-        TripScoreCalculator tsc = new TripScoreCalculator();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mTelemetry = (TextView) findViewById(R.id.telemetry);
