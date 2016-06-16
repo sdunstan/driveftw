@@ -198,6 +198,11 @@ public class DriveService extends IntentService {
         TripScoreCalculator tsc = new TripScoreCalculator();
         drive.setDriveCost(new BigDecimal("3.22"));
         drive.setDriveScore(tsc.getTripScore(driveTelementryList));
+        /* If engineRunTime starts at 00:00:00 and runs to end, use to calc miles driven
+        Map<String, Object> scores = tsc.calcScores(driveTelementryList);
+        drive.setDriveScore((Integer)scores.get(TripScoreCalculator.TRIP_SCORE));
+        drive.setDriveCost((BigDecimal)scores.get(TripScoreCalculator.TRIP_COST));
+        */
         AchievementCalc achievementCalc = new AchievementCalc();
         drive.setAchievements(achievementCalc.getAchievements(driveTelementryList));
         db.saveDrive(drive);
