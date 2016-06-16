@@ -15,14 +15,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.stevedunstan.driveftw.bluetooth.DeviceException;
 import com.stevedunstan.driveftw.bluetooth.DeviceManager;
 import com.stevedunstan.driveftw.calculation.TripScoreCalculator;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.stevedunstan.driveftw.DriveService.DRIVE_TELEMETRY_EVENT;
 import static com.stevedunstan.driveftw.DriveService.DRIVE_TELEMETRY_STOPPED_EVENT;
@@ -45,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mTelemetry = (TextView) findViewById(R.id.telemetry);
         Button scoreButton = (Button) findViewById(R.id.scoreButton);
+
+        
 
         scoreButton.setText(Integer.toString(tsc.getTripScore(ed)));
 
