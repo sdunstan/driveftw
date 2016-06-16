@@ -1,11 +1,15 @@
 package com.stevedunstan.driveftw;
 
 import android.app.IntentService;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -44,6 +48,7 @@ public class DriveService extends IntentService {
     public static final String ENGINE_LOAD = "ENGINE_LOAD";
     public static final String FUEL_LEVEL="FUEL_LEVEL";
     public static final String FUEL_CONSUMPTION = "FUEL_CONSUMPTION";
+    private static final int NOTIFICATION_ID = 31415;
 
 
     public DriveService() {
@@ -176,7 +181,28 @@ public class DriveService extends IntentService {
         }
 
         reportAllTelemetry(driveTelementryList);
-        // TODO: create notification
+        createNotification(driveTelementryList);
+    }
+
+    private void createNotification(ArrayList<DriveTelementry> driveTelementryList) {
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("Drive Completed")
+                        .setContentText("You just completed a drive! Tap here to view your score.");
+        Intent resultIntent = new Intent(this, MainActivity.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     }
 
     private DriveTelementry addTelemetryToList(Map<String, ObdCommand> telemetry) {
