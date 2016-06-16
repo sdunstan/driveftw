@@ -229,13 +229,6 @@ public class DriveService extends IntentService {
 
         DriveTelementry driveTelementry = new DriveTelementry();
 
-        // TODO: get rid of these
-        float speed,engineLoad,fuelLevel;
-        Float speedy = Float.parseFloat(telemetry.get(SPEED).getCalculatedResult());
-        Float engineLoady = Float.parseFloat(telemetry.get(ENGINE_LOAD).getCalculatedResult());
-        Float fuelLevely = Float.parseFloat(telemetry.get(FUEL_LEVEL).getCalculatedResult());
-
-        // Do them all like this with the try/catch
         float throttlePosition = 0.0f;
         try {
             throttlePosition = ((ThrottlePositionCommand) telemetry.get(THROTTLE_POSITION)).getPercentage();
@@ -252,29 +245,37 @@ public class DriveService extends IntentService {
         catch (Throwable t) {
         }
 
-        // TODO: get rid of this
-        if(speedy != null){
-            speed = speedy.floatValue();
-        }else {
-            speed = 0;
-        }
-        if(engineLoady != null){
-            engineLoad = engineLoady.floatValue();
-        }else{
-            engineLoad =0;
-        }
-        if(fuelLevely != null) {
-            fuelLevel = fuelLevely.floatValue();
-        }else{
-            fuelLevel=0;
+        float speed = 0f;
+        try {
+            speed = ((SpeedCommand) telemetry.get(SPEED)).getImperialSpeed();
+            driveTelementry.setSpeed(speed);
+        }catch (Throwable t){
+
         }
 
-        // TODO: get rid of this too.
-        driveTelementry.setEngineRunTime(telemetry.get(ENGINE_RUNTIME).getFormattedResult());
-        driveTelementry.setSpeed(speed);
-        driveTelementry.setEngineLoad(engineLoad);
-        driveTelementry.setFuelLevel(fuelLevel);
+        float engineLoad = 0f;
+        try{
+            engineLoad = ((LoadCommand) telemetry.get(ENGINE_LOAD)).getPercentage();
+            driveTelementry.setEngineLoad(engineLoad);
+        }catch (Throwable t){
 
+        }
+
+        float fuelLevel = 0f;
+        try{
+            fuelLevel = ((FuelLevelCommand) telemetry.get(FUEL_LEVEL)).getPercentage();
+            driveTelementry.setFuelLevel(fuelLevel);
+        }catch (Throwable t){
+
+        }
+
+        String runTime = "";
+        try {
+            runTime = ((RuntimeCommand) telemetry.get(ENGINE_RUNTIME)).getCalculatedResult();
+            driveTelementry.setEngineRunTime(runTime);
+        } catch (Throwable t){
+
+        }
         return  driveTelementry;
     }
 
