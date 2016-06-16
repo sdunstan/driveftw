@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -27,7 +26,6 @@ import com.github.pires.obd.enums.ObdProtocols;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -47,8 +45,6 @@ public class DriveService extends IntentService {
     public static final String FUEL_LEVEL="FUEL_LEVEL";
     public static final String FUEL_CONSUMPTION = "FUEL_CONSUMPTION";
 
-
-    public List<DriveTelementry> driveTelementryList = new ArrayList<>();
 
     public DriveService() {
         super("DriveService");
@@ -138,6 +134,8 @@ public class DriveService extends IntentService {
 
 
     private void collectTelemetry(BluetoothSocket socket) throws InterruptedException, IOException {
+        ArrayList<DriveTelementry> driveTelementryList = new ArrayList<>();
+
         while(socket.isConnected()) {
             Thread.sleep(5000);
 
@@ -177,7 +175,7 @@ public class DriveService extends IntentService {
             driveTelementryList.add(addTelemetryToList(telemetry));
         }
 
-        // TODO: create DriveTelemetry object and broadcast it
+        reportAllTelemetry(driveTelementryList);
         // TODO: create notification
     }
 
@@ -185,14 +183,30 @@ public class DriveService extends IntentService {
 
         DriveTelementry driveTelementry = new DriveTelementry();
 
-        float speed,engineLoad,throttle_position,fuelLevel;
+        // TODO: get rid of these
+        float speed,engineLoad,fuelLevel;
+        Float speedy = Float.parseFloat(telemetry.get(SPEED).getCalculatedResult());
+        Float engineLoady = Float.parseFloat(telemetry.get(ENGINE_LOAD).getCalculatedResult());
+        Float fuelLevely = Float.parseFloat(telemetry.get(FUEL_LEVEL).getCalculatedResult());
 
+        // Do them all like this with the try/catch
+        float throttlePosition = 0.0f;
+        try {
+            throttlePosition = ((ThrottlePositionCommand) telemetry.get(THROTTLE_POSITION)).getPercentage();
+            driveTelementry.setThrottle_position(throttlePosition);
+        }
+        catch (Throwable t) {
+        }
 
-              Float speedy = Float.parseFloat(telemetry.get(SPEED).getCalculatedResult());
-              Float engineLoady = Float.parseFloat(telemetry.get(ENGINE_LOAD).getCalculatedResult());
-              Float fuelLevely = Float.parseFloat(telemetry.get(FUEL_LEVEL).getCalculatedResult());
-              Float throttle_positiony = Float.parseFloat(telemetry.get(THROTTLE_POSITION).getCalculatedResult());
+        int rpm = 0;
+        try {
+            rpm = ((RPMCommand)telemetry.get(RPM)).getRPM();
+            driveTelementry.setRevPerMinute(rpm);
+        }
+        catch (Throwable t) {
+        }
 
+        // TODO: get rid of this
         if(speedy != null){
             speed = speedy.floatValue();
         }else {
@@ -208,20 +222,20 @@ public class DriveService extends IntentService {
         }else{
             fuelLevel=0;
         }
-        if(throttle_positiony != null) {
-            throttle_position = throttle_positiony.floatValue();
-        }else {
-            throttle_position=0;
-        }
 
-
+        // TODO: get rid of this too.
         driveTelementry.setEngineRunTime(telemetry.get(ENGINE_RUNTIME).getFormattedResult());
         driveTelementry.setSpeed(speed);
         driveTelementry.setEngineLoad(engineLoad);
         driveTelementry.setFuelLevel(fuelLevel);
-        driveTelementry.setThrottle_position(throttle_position);
 
         return  driveTelementry;
+    }
+
+    private void reportAllTelemetry(ArrayList<DriveTelementry> driveTelementryList) {
+        Intent telemetryIntent = new Intent(DRIVE_TELEMETRY_EVENT);
+        telemetryIntent.putParcelableArrayListExtra("TELEMETRY", driveTelementryList);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(telemetryIntent);
     }
 
     private void reportTelemetry(Map<String, String> telemetry) {

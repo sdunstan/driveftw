@@ -1,17 +1,16 @@
 package com.stevedunstan.driveftw;
 
-import com.github.pires.obd.commands.ObdCommand;
-
-import java.util.Map;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Created by M on 6/15/2016.
  */
-public class DriveTelementry {
+public class DriveTelementry implements Parcelable {
 
 
 
-    private float revPerMinute;
+    private int revPerMinute;
     private float throttle_position;
     private float speed;
     private float engineLoad;
@@ -58,11 +57,51 @@ public class DriveTelementry {
         this.fuelLevel = fuelLevel;
     }
 
-    public float getRevPerMinute() {
+    public int getRevPerMinute() {
         return revPerMinute;
     }
 
-    public void setRevPerMinute(float revPerMinute) {
+    public void setRevPerMinute(int revPerMinute) {
         this.revPerMinute = revPerMinute;
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.revPerMinute);
+        dest.writeFloat(this.throttle_position);
+        dest.writeFloat(this.speed);
+        dest.writeFloat(this.engineLoad);
+        dest.writeString(this.engineRunTime);
+        dest.writeFloat(this.fuelLevel);
+    }
+
+    public DriveTelementry() {
+    }
+
+    protected DriveTelementry(Parcel in) {
+        this.revPerMinute = in.readInt();
+        this.throttle_position = in.readFloat();
+        this.speed = in.readFloat();
+        this.engineLoad = in.readFloat();
+        this.engineRunTime = in.readString();
+        this.fuelLevel = in.readFloat();
+    }
+
+    public static final Parcelable.Creator<DriveTelementry> CREATOR = new Parcelable.Creator<DriveTelementry>() {
+        @Override
+        public DriveTelementry createFromParcel(Parcel source) {
+            return new DriveTelementry(source);
+        }
+
+        @Override
+        public DriveTelementry[] newArray(int size) {
+            return new DriveTelementry[size];
+        }
+    };
 }
