@@ -183,15 +183,16 @@ public class DriveService extends IntentService {
             driveTelementryList.add(addTelemetryToList(telemetry));
         }
 
-        createNotification(saveDrive());
+        createNotification(saveDrive(driveTelementryList));
     }
 
-    private Drive saveDrive() {
+    private Drive saveDrive(ArrayList<DriveTelementry> driveTelementryList) {
         // TODO: use real data.
         Database db = new Database();
         Drive drive = new Drive();
         drive.setDriveCost(new BigDecimal("3.22"));
         drive.setDriveScore(31415);
+        // TODO: call the achievements calculator instead of this hard codeded mess.
         List<Achievement> achievements = new ArrayList<>();
         achievements.add(Achievement.FEATHERFOOT);
         achievements.add(Achievement.PARKINGLOT);
