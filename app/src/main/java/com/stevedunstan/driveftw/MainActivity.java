@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import com.stevedunstan.driveftw.bluetooth.DeviceException;
 import com.stevedunstan.driveftw.bluetooth.DeviceManager;
-import com.stevedunstan.driveftw.calculation.TripScoreCalculator;
 
 import static com.stevedunstan.driveftw.DriveService.DRIVE_TELEMETRY_EVENT;
 import static com.stevedunstan.driveftw.DriveService.DRIVE_TELEMETRY_STOPPED_EVENT;
@@ -40,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
         Button scoreButton = (Button) findViewById(R.id.scoreButton);
 
         Drive drive = getIntent().getParcelableExtra("DRIVE");
-        scoreButton.setText(String.valueOf(drive.getDriveScore()));
+        if (drive != null)
+            scoreButton.setText(String.valueOf(drive.getDriveScore()));
 
         scoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
