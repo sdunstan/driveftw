@@ -26,14 +26,12 @@ import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
 import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
 import com.github.pires.obd.commands.protocol.TimeoutCommand;
 import com.github.pires.obd.enums.ObdProtocols;
-import com.stevedunstan.driveftw.calculation.Achievement;
 import com.stevedunstan.driveftw.calculation.AchievementCalc;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -182,7 +180,7 @@ public class DriveService extends IntentService {
             sendCommand(consumptionRateCommand, socket, telemetry, FUEL_CONSUMPTION);
 
             DriveTelementry driveTelementry = addTelemetryToList(telemetry);
-            if (driveTelementry.getRevPerMinute() == 0)
+            if (driveTelementry.getFuelLevel() == 0.0)
                 break;
             driveTelementryList.add(driveTelementry);
         }

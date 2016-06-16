@@ -28,7 +28,7 @@ public class Database {
         String driveKey = dbReference.child("drives").push().getKey();
 
         Map<String,Object> drivesMap = new HashMap<>();
-        drivesMap.put("drives/" + driveKey, drive);
+        drivesMap.put("drives/" + driveKey, drive.toMap());
         
         dbReference.updateChildren(drivesMap);
     }

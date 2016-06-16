@@ -7,7 +7,9 @@ import com.stevedunstan.driveftw.calculation.Achievement;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Drive implements Parcelable {
 
@@ -32,6 +34,9 @@ public class Drive implements Parcelable {
     }
 
     public List<Achievement> getAchievements() {
+        if (achievements == null)
+            achievements = new ArrayList<>();
+
         return achievements;
     }
 
@@ -74,4 +79,19 @@ public class Drive implements Parcelable {
         }
     };
 
+    public Map<String,Object> toMap() {
+        Map<String,Object> driveMap = new HashMap<>();
+        driveMap.put("driveCost", getDriveCost().toString());
+        driveMap.put("driveScore", getDriveScore());
+
+        Map<String,Object> achievementsMap = new HashMap<>();
+        int index = 0;
+        for (Achievement achievement : getAchievements()) {
+            achievementsMap.put(""+index, achievement.name());
+            index++;
+        }
+
+        driveMap.put("achievements", achievementsMap);
+        return driveMap;
+    }
 }
