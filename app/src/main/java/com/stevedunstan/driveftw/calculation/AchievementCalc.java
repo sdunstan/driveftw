@@ -25,7 +25,7 @@ public class AchievementCalc  {
     DriveTelementry minThrottle;
 
 
-    List<Achievement> getAchievements(List<DriveTelementry> driveTelementry){
+    public List<Achievement> getAchievements(List<DriveTelementry> driveTelementry){
         List<Achievement> achievements = new ArrayList<Achievement>();
 
             maxSpeed = Collections.max(driveTelementry,new SpeedComparator());

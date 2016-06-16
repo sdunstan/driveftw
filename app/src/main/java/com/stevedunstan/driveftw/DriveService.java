@@ -27,6 +27,7 @@ import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
 import com.github.pires.obd.commands.protocol.TimeoutCommand;
 import com.github.pires.obd.enums.ObdProtocols;
 import com.stevedunstan.driveftw.calculation.Achievement;
+import com.stevedunstan.driveftw.calculation.AchievementCalc;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -197,11 +198,8 @@ public class DriveService extends IntentService {
         Drive drive = new Drive();
         drive.setDriveCost(new BigDecimal("3.22"));
         drive.setDriveScore(31415);
-        // TODO: call the achievements calculator instead of this hard codeded mess.
-        List<Achievement> achievements = new ArrayList<>();
-        achievements.add(Achievement.FEATHERFOOT);
-        achievements.add(Achievement.PARKINGLOT);
-        drive.setAchievements(achievements);
+        AchievementCalc achievementCalc = new AchievementCalc();
+        drive.setAchievements(achievementCalc.getAchievements(driveTelementryList));
         db.saveDrive(drive);
 
         return drive;
