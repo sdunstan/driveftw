@@ -41,9 +41,8 @@ public class MainActivity extends AppCompatActivity {
         mTelemetry = (TextView) findViewById(R.id.telemetry);
         Button scoreButton = (Button) findViewById(R.id.scoreButton);
 
-
-
-        scoreButton.setText(Integer.toString(tsc.getTripScore(ed)));
+        Drive drive = getIntent().getParcelableExtra("DRIVE");
+        scoreButton.setText(String.valueOf(drive.getDriveScore()));
 
         scoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
