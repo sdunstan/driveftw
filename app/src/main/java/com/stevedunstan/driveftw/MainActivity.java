@@ -34,16 +34,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        EconomicData ed = new EconomicData(this);
-        TripScoreCalculator tsc = new TripScoreCalculator();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mTelemetry = (TextView) findViewById(R.id.telemetry);
         Button scoreButton = (Button) findViewById(R.id.scoreButton);
 
-
-
-        scoreButton.setText(Integer.toString(tsc.getTripScore(ed)));
+        Drive drive = getIntent().getParcelableExtra("DRIVE");
+        scoreButton.setText(String.valueOf(drive.getDriveScore()));
 
         scoreButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -27,6 +27,7 @@ import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
 import com.github.pires.obd.commands.protocol.TimeoutCommand;
 import com.github.pires.obd.enums.ObdProtocols;
 import com.stevedunstan.driveftw.calculation.AchievementCalc;
+import com.stevedunstan.driveftw.calculation.TripScoreCalculator;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -194,8 +195,9 @@ public class DriveService extends IntentService {
         // TODO: use real data.
         Database db = new Database();
         Drive drive = new Drive();
+        TripScoreCalculator tsc = new TripScoreCalculator();
         drive.setDriveCost(new BigDecimal("3.22"));
-        drive.setDriveScore(31415);
+        drive.setDriveScore(tsc.getTripScore(driveTelementryList));
         AchievementCalc achievementCalc = new AchievementCalc();
         drive.setAchievements(achievementCalc.getAchievements(driveTelementryList));
         db.saveDrive(drive);
