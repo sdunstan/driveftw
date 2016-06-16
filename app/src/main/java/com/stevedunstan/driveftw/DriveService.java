@@ -26,10 +26,13 @@ import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
 import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
 import com.github.pires.obd.commands.protocol.TimeoutCommand;
 import com.github.pires.obd.enums.ObdProtocols;
+import com.stevedunstan.driveftw.calculation.Achievement;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -180,17 +183,33 @@ public class DriveService extends IntentService {
             driveTelementryList.add(addTelemetryToList(telemetry));
         }
 
-        reportAllTelemetry(driveTelementryList);
-        createNotification(driveTelementryList);
+        createNotification(saveDrive());
     }
 
-    private void createNotification(ArrayList<DriveTelementry> driveTelementryList) {
+    private Drive saveDrive() {
+        // TODO: use real data.
+        Database db = new Database();
+        Drive drive = new Drive();
+        drive.setDriveCost(new BigDecimal("3.22"));
+        drive.setDriveScore(31415);
+        List<Achievement> achievements = new ArrayList<>();
+        achievements.add(Achievement.FEATHERFOOT);
+        achievements.add(Achievement.PARKINGLOT);
+        drive.setAchievements(achievements);
+        db.saveDrive(drive);
+
+        return drive;
+    }
+
+    private void createNotification(Drive drive) {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle("Drive Completed")
                         .setContentText("You just completed a drive! Tap here to view your score.");
         Intent resultIntent = new Intent(this, MainActivity.class);
+        resultIntent.putExtra("DRIVE", drive); // now all the main activity has to do is get this and display it
+
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addParentStack(MainActivity.class);
         stackBuilder.addNextIntent(resultIntent);
@@ -256,12 +275,6 @@ public class DriveService extends IntentService {
         driveTelementry.setFuelLevel(fuelLevel);
 
         return  driveTelementry;
-    }
-
-    private void reportAllTelemetry(ArrayList<DriveTelementry> driveTelementryList) {
-        Intent telemetryIntent = new Intent(DRIVE_TELEMETRY_EVENT);
-        telemetryIntent.putParcelableArrayListExtra("TELEMETRY", driveTelementryList);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(telemetryIntent);
     }
 
     private void reportTelemetry(Map<String, String> telemetry) {

@@ -28,7 +28,7 @@ public class Database {
         String driveKey = dbReference.child("drives").push().getKey();
 
         Map<String,Object> drivesMap = new HashMap<>();
-        drivesMap.put("drives/" + driveKey, drive.toMap());
+        drivesMap.put("drives/" + driveKey, drive);
         
         dbReference.updateChildren(drivesMap);
     }
@@ -40,10 +40,4 @@ public class Database {
         }
     }
 
-    // TODO: rip this out when this object is ready
-    private class Drive {
-        public Map<String,Object> toMap() {
-            return null;
-        }
-    }
 }
