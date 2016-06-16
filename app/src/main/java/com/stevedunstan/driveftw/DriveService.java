@@ -180,10 +180,15 @@ public class DriveService extends IntentService {
             Log.d(TAG, "Running fuel consumption");
             sendCommand(consumptionRateCommand, socket, telemetry, FUEL_CONSUMPTION);
 
-            driveTelementryList.add(addTelemetryToList(telemetry));
+            DriveTelementry driveTelementry = addTelemetryToList(telemetry);
+            if (driveTelementry.getRevPerMinute() == 0)
+                break;
+            driveTelementryList.add(driveTelementry);
         }
 
-        createNotification(saveDrive(driveTelementryList));
+        if (driveTelementryList.size() > 0) {
+            createNotification(saveDrive(driveTelementryList));
+        }
     }
 
     private Drive saveDrive(ArrayList<DriveTelementry> driveTelementryList) {
